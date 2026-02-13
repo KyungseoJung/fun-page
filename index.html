@@ -17,6 +17,7 @@
       --shadow: 0 18px 70px rgba(0,0,0,0.45);
     }
     *{ box-sizing:border-box; }
+
     body{
       margin:0;
       min-height:100vh;
@@ -35,34 +36,91 @@
     }
 
     .card{
-      width:min(720px, 92vw);
+      width:min(760px, 94vw);
       padding:40px 28px;
       background: var(--card);
       border: 1px solid var(--stroke);
-      border-radius: 20px;
+      border-radius: 22px;
       box-shadow: var(--shadow);
       text-align:center;
       backdrop-filter: blur(10px);
       position: relative;
 
-      /* ✅ 잘림 방지 */
       max-height: calc(100vh - 40px);
       overflow-y: auto;
       overflow-x: hidden;
     }
+
+    /* ===== 장식들 ===== */
+    .decor{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      z-index: 0;
+      overflow:hidden;
+    }
+    .floaty{
+      position:absolute;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.35));
+      opacity: 0.95;
+      animation: float 4.6s ease-in-out infinite;
+      transform-origin: center;
+    }
+    .floaty.small{ font-size: 26px; }
+    .floaty.mid{ font-size: 34px; }
+    .floaty.big{ font-size: 44px; }
+
+    .floaty.dog1{ left: 18px; top: 18px; animation-duration: 4.4s; }
+    .floaty.dog2{ right: 18px; top: 22px; animation-duration: 5.1s; }
+    .floaty.meat{ left: 22px; bottom: 26px; animation-duration: 5.4s; }
+    .floaty.chicken{ right: 26px; bottom: 22px; animation-duration: 4.9s; }
+
+    .green-dot{
+      position:absolute;
+      width: 90px; height: 90px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.25), transparent 45%),
+                  radial-gradient(circle at 55% 60%, rgba(0,255,140,0.55), rgba(0,255,140,0.22) 55%, rgba(0,255,140,0.10));
+      border: 1px solid rgba(255,255,255,0.14);
+      filter: blur(0.1px);
+      opacity: 0.65;
+      animation: float 6.2s ease-in-out infinite;
+    }
+    .dot1{ left: -18px; top: 140px; width: 120px; height: 120px; animation-duration: 6.8s; }
+    .dot2{ right: -24px; top: 170px; width: 110px; height: 110px; animation-duration: 7.1s; }
+    .dot3{ left: 90px; bottom: -36px; width: 140px; height: 140px; animation-duration: 7.6s; opacity:0.55; }
+    .dot4{ right: 110px; top: -40px; width: 130px; height: 130px; animation-duration: 8.0s; opacity:0.5; }
+
+    @keyframes float{
+      0%,100%{ transform: translateY(0) rotate(-1deg) scale(1); }
+      50%{ transform: translateY(-10px) rotate(1deg) scale(1.02); }
+    }
+
+    /* 반짝이 */
+    .sparkles{
+      position:absolute;
+      inset:0;
+      z-index:1;
+      opacity: 0.22;
+      pointer-events:none;
+      background:
+        radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.35), transparent 60%),
+        radial-gradient(2px 2px at 60% 18%, rgba(255,255,255,0.25), transparent 60%),
+        radial-gradient(2px 2px at 78% 42%, rgba(255,255,255,0.30), transparent 60%),
+        radial-gradient(2px 2px at 30% 70%, rgba(255,255,255,0.22), transparent 60%),
+        radial-gradient(2px 2px at 85% 78%, rgba(255,255,255,0.26), transparent 60%);
+    }
+
+    /* 내용 레이어는 장식 위 */
+    .content{ position: relative; z-index: 2; }
 
     h1{
       margin:0 0 14px;
       font-size: 30px;
       letter-spacing: -0.6px;
     }
-    p{
-      margin:0 0 18px;
-      color: var(--muted);
-      font-size: 14px;
-    }
 
-    /* 질문 화면 버튼 영역(여기 안에서만 아니오가 도망) */
+    /* 질문 화면 버튼 영역 */
     .btn-area{
       position: relative;
       width: 100%;
@@ -71,7 +129,7 @@
       align-items:center;
       justify-content:center;
       gap: 14px;
-      margin-top: 4px;
+      margin-top: 6px;
     }
 
     button{
@@ -85,7 +143,7 @@
       user-select:none;
       -webkit-tap-highlight-color: transparent;
       position: relative;
-      z-index: 2;
+      z-index: 3;
     }
 
     #yesBtn{
@@ -101,36 +159,22 @@
       color: var(--text);
       border: 1px solid rgba(255,255,255,0.16);
       position: absolute;
-      left: 50%;
+      /* ✅ 처음엔 옆에 나란히 보이게: 가운데 기준 오른쪽 */
+      left: calc(50% + 95px);
       top: 50%;
-      transform: translate(calc(-50% + 140px), -50%);
-      z-index: 3;
+      transform: translate(-50%, -50%);
+      z-index: 4;
       will-change: left, top, transform;
     }
     #noBtn:hover{ filter: brightness(1.08); }
 
     .hidden{ display:none; }
 
-    /* 반짝이 */
-    .sparkles{
-      position:absolute;
-      inset:0;
-      z-index:0;
-      opacity: 0.24;
-      pointer-events:none;
-      background:
-        radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.35), transparent 60%),
-        radial-gradient(2px 2px at 60% 18%, rgba(255,255,255,0.25), transparent 60%),
-        radial-gradient(2px 2px at 78% 42%, rgba(255,255,255,0.30), transparent 60%),
-        radial-gradient(2px 2px at 30% 70%, rgba(255,255,255,0.22), transparent 60%),
-        radial-gradient(2px 2px at 85% 78%, rgba(255,255,255,0.26), transparent 60%);
-    }
-
     /* ====== 결과 화면 ====== */
     .stage{
       position: relative;
       width: 100%;
-      min-height: 520px; /* ✅ 공간 넉넉하게 */
+      min-height: 520px;
       height: auto;
       padding-bottom: 18px;
       display:flex;
@@ -154,13 +198,13 @@
     .cake-wrap{
       position: relative;
       width: 340px;
-      height: 300px;      /* ✅ 케이크 위 공간 확보 */
+      height: 320px;      /* ✅ 촛불 겹침 방지: 더 넉넉 */
       display:flex;
       align-items:flex-end;
       justify-content:center;
       z-index: 2;
       filter: drop-shadow(0 10px 18px rgba(0,0,0,0.35));
-      margin-top: 16px;   /* ✅ 위쪽 여백 */
+      margin-top: 18px;
     }
 
     .plate{
@@ -174,7 +218,6 @@
       backdrop-filter: blur(6px);
     }
 
-    /* 케이크 층(더 케이크답게) */
     .tier{
       position:absolute;
       left: 50%;
@@ -214,7 +257,6 @@
         linear-gradient(180deg, rgba(92,48,26,0.12), rgba(92,48,26,0.04));
     }
 
-    /* 크림 드립(위쪽) */
     .tier::before{
       content:"";
       position:absolute;
@@ -234,7 +276,6 @@
       opacity: 0.95;
     }
 
-    /* 스프링클 */
     .tier::after{
       content:"";
       position:absolute;
@@ -255,11 +296,11 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* 촛불 */
+    /* 촛불 (더 위로 + 공간 넉넉) */
     .candle{
       position:absolute;
       left: 50%;
-      bottom: 292px; /* ✅ 위로 올려 겹침 방지 */
+      bottom: 308px;
       transform: translateX(-50%) translateY(40px);
       width: 16px;
       height: 40px;
@@ -287,11 +328,10 @@
       50%{ transform: translateX(-50%) scale(0.85); opacity: .6; }
     }
 
-    /* 토핑(체리/딸기) */
     .topping{
       position:absolute;
       left: 50%;
-      bottom: 280px; /* ✅ 촛불 아래로 */
+      bottom: 296px;
       transform: translateX(-50%) translateY(18px);
       width: 26px;
       height: 22px;
@@ -316,14 +356,13 @@
     }
     .topping.on{ opacity:1; transform: translateX(-50%) translateY(0); }
 
-    /* 문구(번호 제거) */
     .messages{
       width: min(520px, 92%);
       z-index: 3;
       display:flex;
       flex-direction: column;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 8px;
       align-items: center;
     }
     .msg{
@@ -347,7 +386,6 @@
       transform: translateY(0) scale(1);
     }
 
-    /* 최종 축하 문구 */
     .final{
       z-index: 3;
       margin-top: 12px;
@@ -368,60 +406,79 @@
 
 <body>
   <div class="card">
+    <!-- 장식 레이어 -->
+    <div class="decor" aria-hidden="true">
+      <div class="green-dot dot1"></div>
+      <div class="green-dot dot2"></div>
+      <div class="green-dot dot3"></div>
+      <div class="green-dot dot4"></div>
+
+      <!-- 말티즈 느낌: 🐶 2마리 -->
+      <div class="floaty dog1 big">🐶</div>
+      <div class="floaty dog2 big">🐶</div>
+
+      <!-- 고기/치킨 -->
+      <div class="floaty meat mid">🍖</div>
+      <div class="floaty chicken mid">🍗</div>
+    </div>
     <div class="sparkles"></div>
 
-    <!-- 질문 화면 -->
-    <div id="questionView">
-      <h1>경서랑 요거트 먹어줄 건가요? 🥣</h1>
+    <!-- 내용 레이어 -->
+    <div class="content">
+      <!-- 질문 화면 -->
+      <div id="questionView">
+        <h1>경서랑 요거트 먹어줄 건가요? 🥣</h1>
 
-      <div class="btn-area" id="btnArea">
-        <button id="yesBtn" type="button">예</button>
-        <button id="noBtn" type="button">아니오</button>
+        <!-- ✅ 처음엔 예/아니오 나란히 -->
+        <div class="btn-area" id="btnArea">
+          <button id="yesBtn" type="button">예</button>
+          <button id="noBtn" type="button">아니오</button>
+        </div>
       </div>
-    </div>
 
-    <!-- 결과 화면 -->
-    <div id="resultView" class="hidden">
-      <div class="stage">
-        <canvas id="fx"></canvas>
+      <!-- 결과 화면 -->
+      <div id="resultView" class="hidden">
+        <div class="stage">
+          <canvas id="fx"></canvas>
 
-        <div class="cake-wrap" aria-label="cake animation">
-          <div class="plate"></div>
+          <div class="cake-wrap" aria-label="cake animation">
+            <div class="plate"></div>
 
-          <div class="tier t1"></div>
-          <div class="tier t2"></div>
-          <div class="tier t3"></div>
-          <div class="tier t4"></div>
-          <div class="tier t5"></div>
+            <div class="tier t1"></div>
+            <div class="tier t2"></div>
+            <div class="tier t3"></div>
+            <div class="tier t4"></div>
+            <div class="tier t5"></div>
 
-          <div class="candle" id="candle">
-            <div class="flame"></div>
+            <div class="candle" id="candle">
+              <div class="flame"></div>
+            </div>
+
+            <div class="topping" id="topping" aria-hidden="true"></div>
           </div>
 
-          <div class="topping" id="topping" aria-hidden="true"></div>
-        </div>
+          <div class="messages" id="messages">
+            <div class="msg">안뇽안뇽 나는 경서야</div>
+            <div class="msg">해피 발렌타인 🎉🎊🎂</div>
+            <div class="msg">해피 설날</div>
+            <div class="msg">해피 졸업식</div>
+            <div class="msg">해피 800일</div>
+          </div>
 
-        <!-- 문구들(번호 제거) -->
-        <div class="messages" id="messages">
-          <div class="msg">안뇽안뇽 나는 경서야</div>
-          <div class="msg">해피 발렌타인 🎉🎊🎂</div>
-          <div class="msg">해피 설날</div>
-          <div class="msg">해피 졸업식</div>
-          <div class="msg">해피 800일</div>
+          <div class="final" id="finalText">🥳축하해에ㅎㅎㅎ🎂</div>
         </div>
-
-        <div class="final" id="finalText">🥳축하해에ㅎㅎㅎ🎂</div>
       </div>
     </div>
   </div>
 
   <script>
-    // ====== 1) "아니오" 버튼: 화면 밖으로 절대 안 나가게 + 근처 오면 순간이동 ======
+    // ====== 1) "아니오" 버튼: 가까이 오면 btn-area 내부에서만 도망 ======
     const yesBtn = document.getElementById("yesBtn");
     const noBtn  = document.getElementById("noBtn");
     const btnArea = document.getElementById("btnArea");
 
     function rand(min, max){ return Math.random() * (max - min) + min; }
+    let didFirstLayout = false;
 
     function placeNoButtonWithinArea(preferAwayFrom){
       const areaRect = btnArea.getBoundingClientRect();
@@ -433,9 +490,21 @@
       const maxX = Math.max(pad, areaRect.width  - btnRect.width  - pad);
       const maxY = Math.max(pad, areaRect.height - btnRect.height - pad);
 
+      // ✅ 첫 배치: "예" 오른쪽에 나란히 (center y)
+      if (!preferAwayFrom && !didFirstLayout){
+        const x = Math.min(maxX, Math.max(minX, (areaRect.width/2) + 14));
+        const y = (areaRect.height - btnRect.height) / 2;
+        noBtn.style.left = `${x}px`;
+        noBtn.style.top  = `${y}px`;
+        noBtn.style.transform = `translate(0, 0)`;
+        didFirstLayout = true;
+        return;
+      }
+
       let x = rand(minX, maxX);
       let y = rand(minY, maxY);
 
+      // 마우스/터치 위치에서 최대한 멀리 보내기
       if (preferAwayFrom) {
         const tries = 10;
         let best = {x, y, score: -1};
@@ -458,7 +527,7 @@
     }
 
     window.addEventListener("load", () => placeNoButtonWithinArea(null));
-    window.addEventListener("resize", () => placeNoButtonWithinArea(null));
+    window.addEventListener("resize", () => { didFirstLayout = false; placeNoButtonWithinArea(null); });
 
     function handlePointerMove(clientX, clientY){
       const btnRect = noBtn.getBoundingClientRect();
@@ -482,7 +551,7 @@
       handlePointerMove(t.clientX, t.clientY);
     }, {passive:true});
 
-    // ====== 2) 예 클릭: 케이크 쌓기(각 층마다 문구도 쌓기) -> 촛불/토핑 -> 폭죽 -> 축하 문구 ======
+    // ====== 2) 예 클릭: 케이크 쌓기 + 문구 쌓기 -> 촛불/토핑 -> 폭죽 -> 축하 문구 ======
     const questionView = document.getElementById("questionView");
     const resultView   = document.getElementById("resultView");
 
