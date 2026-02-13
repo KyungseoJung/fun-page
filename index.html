@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>선택하시겠습니까?</title>
+  <title>경서랑 요거트 🥣</title>
 
   <style>
     :root{
@@ -19,7 +19,7 @@
     *{ box-sizing:border-box; }
     body{
       margin:0;
-      height:100vh;
+      min-height:100vh;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -36,7 +36,6 @@
 
     .card{
       width:min(720px, 92vw);
-      min-height: 380px;
       padding:40px 28px;
       background: var(--card);
       border: 1px solid var(--stroke);
@@ -45,11 +44,11 @@
       text-align:center;
       backdrop-filter: blur(10px);
       position: relative;
-      overflow:hidden;
 
-      /* 기존 그대로 두고 아래만 추가 */
+      /* ✅ 잘림 방지 */
       max-height: calc(100vh - 40px);
       overflow-y: auto;
+      overflow-x: hidden;
     }
 
     h1{
@@ -131,8 +130,8 @@
     .stage{
       position: relative;
       width: 100%;
-      min-height: 460px;  /* 최소만 유지 */
-      height: auto;       /* 내용에 따라 늘어남 */
+      min-height: 460px; /* 최소만 유지 */
+      height: auto;      /* 내용에 따라 늘어남 */
       padding-bottom: 18px;
       display:flex;
       align-items:center;
@@ -140,7 +139,6 @@
       flex-direction: column;
       gap: 10px;
     }
-
 
     /* 폭죽 캔버스 */
     #fx{
@@ -150,6 +148,7 @@
       height:100%;
       z-index: 1;
       pointer-events:none;
+      opacity: 0.95;
     }
 
     .cake-wrap{
@@ -323,20 +322,20 @@
       z-index: 3;
       display:flex;
       flex-direction: column;
-      gap: 7px;
-      margin-top: 8px;
+      gap: 8px;
+      margin-top: 10px;
       align-items: center;
     }
     .msg{
       width: 100%;
       max-width: 520px;
-      padding: 8px 10px;
+      padding: 9px 12px;
       border-radius: 14px;
       border: 1px solid rgba(255,255,255,0.14);
       background: rgba(255,255,255,0.06);
       backdrop-filter: blur(6px);
       color: rgba(255,255,255,0.92);
-      font-size: 14px;
+      font-size: 15px;
       letter-spacing: -0.2px;
 
       opacity: 0;
@@ -348,36 +347,11 @@
       transform: translateY(0) scale(1);
     }
 
-    /* 기존의 happyText도 유지 (문구 5개 다 쌓이면 등장) */
-    .happy{
-      z-index: 3;
-      margin-top: 8px;
-      font-size: clamp(26px, 4.5vw, 42px);
-      font-weight: 900;
-      letter-spacing: -1px;
-      opacity: 0;
-      transform: translateY(10px) scale(0.98);
-      transition: opacity 700ms ease, transform 700ms cubic-bezier(.2,.9,.2,1);
-      text-shadow: 0 10px 26px rgba(0,0,0,0.35);
-    }
-    .happy.on{
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    .happy span{
-      display:inline-block;
-      animation: pop 1.2s ease-in-out infinite;
-    }
-    @keyframes pop{
-      0%,100%{ transform: translateY(0); }
-      50%{ transform: translateY(-3px); }
-    }
-
-    /* 마지막 큰 축하 문구 */
+    /* ✅ Happy000은 제거, 대신 축하해에ㅎㅎㅎ를 메인으로 */
     .final{
       z-index: 3;
-      margin-top: 6px;
-      font-size: clamp(22px, 4.2vw, 34px);
+      margin-top: 12px;
+      font-size: clamp(26px, 4.6vw, 44px);
       font-weight: 900;
       letter-spacing: -0.8px;
       opacity: 0;
@@ -398,7 +372,7 @@
 
     <!-- 질문 화면 -->
     <div id="questionView">
-      <h1>선택하시겠습니까?</h1>
+      <h1>경서랑 요거트 먹어줄 건가요?</h1>
       <p>아니오를 누르려고 하면… 화면 안에서만 도망갑니다 😈</p>
 
       <div class="btn-area" id="btnArea">
@@ -430,22 +404,15 @@
 
         <!-- 케이크 층마다 차곡차곡 쌓일 문구들 -->
         <div class="messages" id="messages">
-          <div class="msg">안뇽안뇽 나는 경서야</div>
-          <div class="msg">해피 발렌타인 🎉🎊🎂</div>
-          <div class="msg">해피 설날</div>
-          <div class="msg">해피 졸업식</div>
-          <div class="msg">해피 800일</div>
+          <div class="msg">1. 안뇽안뇽 나는 경서야</div>
+          <div class="msg">2. 해피 발렌타인 🎉🎊🎂</div>
+          <div class="msg">3. 해피 설날</div>
+          <div class="msg">4. 해피 졸업식</div>
+          <div class="msg">5. 해피 800일</div>
         </div>
 
-        <!-- 기존 happy 텍스트(요청대로 유지) -->
-        <div class="happy" id="happyText">
-          <span>축</span><span>하</span><span>해</span><span>에</span><span>ㅠ</span>
-          <span>&nbsp;</span>
-          <span>🥳</span><span>🎂</span><span>🎂</span><span></span>
-        </div>
-
-        <!-- 마지막 큰 축하 문구 -->
-        <!-- <div class="final" id="finalText">🥳축하해에ㅎㅎㅎ🎂</div> -->
+        <!-- ✅ Happy000 삭제, 최종 축하 문구만 -->
+        <div class="final" id="finalText">🥳축하해에ㅎㅎㅎ🎂</div>
       </div>
     </div>
   </div>
@@ -471,7 +438,6 @@
       let x = rand(minX, maxX);
       let y = rand(minY, maxY);
 
-      // 마우스/터치 위치에서 최대한 멀리 보내기
       if (preferAwayFrom) {
         const tries = 10;
         let best = {x, y, score: -1};
@@ -502,7 +468,7 @@
       const cy = btnRect.top  + btnRect.height/2;
       const dist = Math.hypot(cx - clientX, cy - clientY);
 
-      const trigger = 120; // 가까워지면 튀기
+      const trigger = 120;
       if (dist < trigger){
         placeNoButtonWithinArea({x: clientX, y: clientY});
       }
@@ -518,7 +484,7 @@
       handlePointerMove(t.clientX, t.clientY);
     }, {passive:true});
 
-    // ====== 2) 예 클릭: 케이크 쌓기(각 층마다 문구도 쌓기) -> 촛불/토핑 -> 폭죽 -> happy -> 마지막 축하 ======
+    // ====== 2) 예 클릭: 케이크 쌓기(각 층마다 문구도 쌓기) -> 촛불/토핑 -> 폭죽 -> 축하 문구 ======
     const questionView = document.getElementById("questionView");
     const resultView   = document.getElementById("resultView");
 
@@ -527,11 +493,8 @@
 
     const candle = document.getElementById("candle");
     const topping = document.getElementById("topping");
-
-    const happyText = document.getElementById("happyText");
     const finalText = document.getElementById("finalText");
 
-    // 폭죽 캔버스
     const canvas = document.getElementById("fx");
     const ctx = canvas.getContext("2d", { alpha: true });
 
@@ -569,7 +532,6 @@
       const rect = canvas.getBoundingClientRect();
       ctx.clearRect(0, 0, rect.width, rect.height);
 
-      // 은은한 잔상
       ctx.fillStyle = "rgba(0,0,0,0.10)";
       ctx.fillRect(0, 0, rect.width, rect.height);
 
@@ -595,46 +557,39 @@
     function delay(ms){ return new Promise(res => setTimeout(res, ms)); }
 
     async function playShow(){
-      // 화면 전환
       questionView.classList.add("hidden");
       resultView.classList.remove("hidden");
 
-      // 리셋
+      // reset
       tiers.forEach(t => t.classList.remove("on"));
       msgs.forEach(m => m.classList.remove("show"));
       candle.classList.remove("on");
       topping.classList.remove("on");
-      happyText.classList.remove("on");
       finalText.classList.remove("on");
 
-      // 폭죽 루프 시작
       resizeCanvas();
       particles = [];
       requestAnimationFrame(stepFireworks);
 
-      // 케이크 쌓기 + 문구 차곡차곡
+      // stack tiers + messages
       for (let i=0; i<tiers.length; i++){
         tiers[i].classList.add("on");
         if (msgs[i]) msgs[i].classList.add("show");
         await delay(650);
       }
 
-      // 촛불 + 토핑
+      // candle + topping
       candle.classList.add("on");
       topping.classList.add("on");
       await delay(380);
 
-      // 폭죽 여러 번
+      // fireworks
       for (let i=0; i<9; i++){
         spawnFirework();
         await delay(220);
       }
 
-      // 기존 happy 텍스트 등장
-      happyText.classList.add("on");
-      await delay(520);
-
-      // 마지막 축하 문구
+      // final text
       finalText.classList.add("on");
     }
 
