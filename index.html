@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>선택하시겠습니까?</title>
+  <style>
+    :root { --bg:#0b0f1a; --card:#121a2b; --text:#eaf0ff; --muted:#a9b6d6; }
+    * { box-sizing: border-box; }
+    body{
+      margin:0;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: radial-gradient(1200px 600px at 50% 30%, #1b2a55, var(--bg));
+      color:var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", Arial, sans-serif;
+    }
+    .card{
+      width:min(520px, 92vw);
+      padding:40px 28px;
+      background: rgba(18,26,43,0.75);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+      text-align:center;
+      backdrop-filter: blur(10px);
+    }
+    h1{
+      margin:0 0 10px;
+      font-size: 28px;
+      letter-spacing: -0.5px;
+    }
+    p{
+      margin:0 0 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .btns{
+      display:flex;
+      gap:14px;
+      justify-content:center;
+      align-items:center;
+      margin-top: 10px;
+    }
+    button{
+      border:0;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 120ms ease, filter 120ms ease;
+      min-width: 110px;
+      user-select:none;
+    }
+    #yesBtn{
+      background: #4f7cff;
+      color:white;
+    }
+    #yesBtn:hover{ filter: brightness(1.05); transform: translateY(-1px); }
+    #noBtn{
+      background: rgba(255,255,255,0.10);
+      color: var(--text);
+      position: relative;
+    }
+    #noBtn:hover{ filter: brightness(1.08); }
+    .result{
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-top: 8px;
+    }
+    .hidden{ display:none; }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div id="questionView">
+      <h1>선택하시겠습니까?</h1>
+      <p>아니오를 누르려고 하면… 도망갑니다 😈</p>
+      <div class="btns">
+        <button id="yesBtn" type="button">예</button>
+        <button id="noBtn" type="button">아니오</button>
+      </div>
+    </div>
+
+    <div id="resultView" class="hidden">
+      <div class="result">happy 000!!</div>
+    </div>
+  </div>
+
+  <script>
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn  = document.getElementById("noBtn");
+    const questionView = document.getElementById("questionView");
+    const resultView   = document.getElementById("resultView");
+
+    // "아니오" 버튼이 움직일 범위(화면 안에서 튀지 않게)
+    function clamp(v, min, max){ return Math.min(Math.max(v, min), max); }
+
+    function moveNoButtonAwayFrom(mouseX, mouseY){
+      const rect = noBtn.getBoundingClientRect();
+      const btnCenterX = rect.left + rect.width / 2;
+      const btnCenterY = rect.top  + rect.height / 2;
+
+      const dx = btnCenterX - mouseX;
+      const dy = btnCenterY - mouseY;
+
+      // 마우스가 버튼에 가까워질 때만 이동
+      const dist = Math.hypot(dx, dy);
+      const trigger = 140; // 가까움 기준(px)
+      if (dist > trigger) return;
+
+      // 방향 벡터 정규화 (마우스 반대 방향으로 밀어냄)
+      const nx = dx / (dist || 1);
+      const ny = dy / (dist || 1);
+
+      const step = 55; // 한번에 도망가는 정도(px)
+
+      // 현재 transform을 읽어서 누적 이동
+      const cur = noBtn.dataset.t ? JSON.parse(noBtn.dataset.t) : {x:0, y:0};
+      let nextX = cur.x + nx * step;
+      let nextY = cur.y + ny * step;
+
+      // 화면 밖으로 너무 나가지 않도록 제한
+      // (버튼의 기준 위치 + transform이 화면에 남도록 clamp)
+      const margin = 10;
+      const maxLeft   = (window.innerWidth  - rect.width  - margin) - rect.left + cur.x;
+      const maxTop    = (window.innerHeight - rect.height - margin) - rect.top  + cur.y;
+      const maxRight  = (margin) - rect.left + cur.x;
+      const maxBottom = (margin) - rect.top  + cur.y;
+
+      nextX = clamp(nextX, maxRight, maxLeft);
+      nextY = clamp(nextY, maxBottom, maxTop);
+
+      noBtn.style.transform = `translate(${nextX}px, ${nextY}px)`;
+      noBtn.dataset.t = JSON.stringify({x: nextX, y: nextY});
+    }
+
+    // 마우스가 버튼 근처로 오면 도망가게 만들기
+    document.addEventListener("mousemove", (e) => {
+      moveNoButtonAwayFrom(e.clientX, e.clientY);
+    }, { passive: true });
+
+    // 혹시 모바일 터치에서도 도망가게
+    document.addEventListener("touchmove", (e) => {
+      const t = e.touches[0];
+      if (!t) return;
+      moveNoButtonAwayFrom(t.clientX, t.clientY);
+    }, { passive: true });
+
+    // 예 클릭 시 결과 화면
+    yesBtn.addEventListener("click", () => {
+      questionView.classList.add("hidden");
+      resultView.classList.remove("hidden");
+    });
+  </script>
+</body>
+</html>
