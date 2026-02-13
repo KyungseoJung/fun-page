@@ -5,156 +5,494 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>선택하시겠습니까?</title>
   <style>
-    :root { --bg:#0b0f1a; --card:#121a2b; --text:#eaf0ff; --muted:#a9b6d6; }
-    * { box-sizing: border-box; }
+    :root{
+      --bg:#070a14;
+      --card: rgba(18,26,43,0.70);
+      --stroke: rgba(255,255,255,0.10);
+      --text:#eef3ff;
+      --muted:#a9b6d6;
+      --shadow: 0 16px 60px rgba(0,0,0,0.45);
+    }
+    *{ box-sizing:border-box; }
     body{
       margin:0;
       height:100vh;
       display:flex;
       align-items:center;
       justify-content:center;
-      background: radial-gradient(1200px 600px at 50% 30%, #1b2a55, var(--bg));
+      background:
+        radial-gradient(900px 550px at 50% 22%, #1b2a55, var(--bg));
       color:var(--text);
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", Arial, sans-serif;
+      overflow:hidden;
     }
+
+    /* 공통 카드 */
     .card{
-      width:min(520px, 92vw);
+      width:min(640px, 92vw);
+      min-height: 360px;
       padding:40px 28px;
-      background: rgba(18,26,43,0.75);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 18px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
       text-align:center;
       backdrop-filter: blur(10px);
+      position: relative;
+      overflow:hidden;
     }
+
     h1{
       margin:0 0 10px;
-      font-size: 28px;
-      letter-spacing: -0.5px;
+      font-size: 30px;
+      letter-spacing: -0.6px;
     }
     p{
-      margin:0 0 24px;
+      margin:0 0 26px;
       color: var(--muted);
       font-size: 14px;
     }
-    .btns{
+
+    /* 버튼 영역: 버튼이 화면 밖으로 튀지 않도록 "고정 레이어"를 하나 둠 */
+    .btn-area{
+      position: relative;
+      width: 100%;
+      height: 90px;
       display:flex;
-      gap:14px;
-      justify-content:center;
       align-items:center;
-      margin-top: 10px;
+      justify-content:center;
+      gap: 14px;
     }
+
     button{
       border:0;
       padding: 12px 18px;
       border-radius: 12px;
       font-size: 16px;
       cursor: pointer;
-      transition: transform 120ms ease, filter 120ms ease;
+      transition: transform 140ms ease, filter 140ms ease;
       min-width: 110px;
       user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      z-index: 2;
     }
     #yesBtn{
       background: #4f7cff;
       color:white;
     }
     #yesBtn:hover{ filter: brightness(1.05); transform: translateY(-1px); }
+
+    /* "아니오"는 absolute로 두고, btn-area 안에서만 움직이게 함 */
     #noBtn{
       background: rgba(255,255,255,0.10);
       color: var(--text);
-      position: relative;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(calc(-50% + 140px), -50%);
+      z-index: 3;
+      will-change: left, top, transform;
     }
     #noBtn:hover{ filter: brightness(1.08); }
-    .result{
-      font-size: 34px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      margin-top: 8px;
-    }
+
     .hidden{ display:none; }
+
+    /* ====== 결과 화면(케이크+폭죽+텍스트) ====== */
+    .stage{
+      position: relative;
+      width: 100%;
+      height: 420px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* 캔버스 폭죽 */
+    #fx{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index: 1;
+      pointer-events:none;
+    }
+
+    /* 케이크 영역 */
+    .cake-wrap{
+      position: relative;
+      width: 320px;
+      height: 250px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      z-index: 2;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.35));
+    }
+
+    /* 케이크 접시 */
+    .plate{
+      position:absolute;
+      bottom: 0;
+      width: 320px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.20);
+      border: 1px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(6px);
+    }
+
+    /* 케이크 층들 */
+    .tier{
+      position:absolute;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      opacity: 0;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(4px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+      transition: transform 520ms cubic-bezier(.2,.9,.2,1), opacity 520ms ease;
+      overflow:hidden;
+    }
+
+    /* 층별 크기 */
+    .t1{ width: 260px; height: 54px; bottom: 18px; }
+    .t2{ width: 230px; height: 50px; bottom: 72px; }
+    .t3{ width: 200px; height: 46px; bottom: 122px; }
+    .t4{ width: 170px; height: 42px; bottom: 168px; }
+    .t5{ width: 140px; height: 38px; bottom: 210px; }
+
+    /* 크림 라인 느낌 */
+    .tier::before{
+      content:"";
+      position:absolute;
+      inset: 10px 12px auto 12px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.22);
+    }
+    .tier::after{
+      content:"";
+      position:absolute;
+      left: 0;
+      right: 0;
+      bottom: 10px;
+      margin: auto;
+      width: 70%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.16);
+    }
+
+    /* 층이 "쌓일 때" 클래스 */
+    .tier.on{
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* 촛불 */
+    .candle{
+      position:absolute;
+      left: 50%;
+      bottom: 250px;
+      transform: translateX(-50%) translateY(40px);
+      width: 16px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.22);
+      border: 1px solid rgba(255,255,255,0.18);
+      opacity: 0;
+      transition: transform 500ms cubic-bezier(.2,.9,.2,1), opacity 500ms ease;
+      z-index: 3;
+    }
+    .candle.on{ opacity:1; transform: translateX(-50%) translateY(0); }
+    .flame{
+      position:absolute;
+      left: 50%;
+      top: -14px;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 16px;
+      border-radius: 999px 999px 999px 999px;
+      background: rgba(255,255,255,0.28);
+      filter: blur(0.2px);
+      animation: flame 0.9s infinite ease-in-out;
+    }
+    @keyframes flame{
+      0%,100%{ transform: translateX(-50%) scale(1); opacity: .9; }
+      50%{ transform: translateX(-50%) scale(0.85); opacity: .6; }
+    }
+
+    /* Happy 텍스트 */
+    .happy{
+      z-index: 3;
+      margin-top: 10px;
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 900;
+      letter-spacing: -1px;
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+      transition: opacity 700ms ease, transform 700ms cubic-bezier(.2,.9,.2,1);
+      text-shadow: 0 10px 26px rgba(0,0,0,0.35);
+    }
+    .happy.on{
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .happy span{
+      display:inline-block;
+      animation: pop 1.2s ease-in-out infinite;
+    }
+    @keyframes pop{
+      0%,100%{ transform: translateY(0); }
+      50%{ transform: translateY(-3px); }
+    }
+
+    /* 작은 반짝이 배경 */
+    .sparkles{
+      position:absolute;
+      inset:0;
+      z-index:0;
+      opacity: 0.35;
+      pointer-events:none;
+      background:
+        radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.35), transparent 60%),
+        radial-gradient(2px 2px at 60% 18%, rgba(255,255,255,0.25), transparent 60%),
+        radial-gradient(2px 2px at 78% 42%, rgba(255,255,255,0.30), transparent 60%),
+        radial-gradient(2px 2px at 30% 70%, rgba(255,255,255,0.22), transparent 60%),
+        radial-gradient(2px 2px at 85% 78%, rgba(255,255,255,0.26), transparent 60%);
+    }
   </style>
 </head>
+
 <body>
-  <div class="card" id="card">
+  <div class="card">
+    <div class="sparkles"></div>
+
+    <!-- 질문 화면 -->
     <div id="questionView">
       <h1>선택하시겠습니까?</h1>
-      <p>아니오를 누르려고 하면… 도망갑니다 😈</p>
-      <div class="btns">
+      <p>아니오를 누르려고 하면… 화면 안에서만 도망갑니다 😈</p>
+
+      <div class="btn-area" id="btnArea">
         <button id="yesBtn" type="button">예</button>
         <button id="noBtn" type="button">아니오</button>
       </div>
     </div>
 
+    <!-- 결과 화면 -->
     <div id="resultView" class="hidden">
-      <div class="result">happy 000!!</div>
+      <div class="stage">
+        <canvas id="fx"></canvas>
+
+        <div class="cake-wrap" aria-label="cake animation">
+          <div class="plate"></div>
+
+          <div class="tier t1"></div>
+          <div class="tier t2"></div>
+          <div class="tier t3"></div>
+          <div class="tier t4"></div>
+          <div class="tier t5"></div>
+
+          <div class="candle" id="candle">
+            <div class="flame"></div>
+          </div>
+        </div>
+
+        <div class="happy" id="happyText">
+          <span>H</span><span>a</span><span>p</span><span>p</span><span>y</span>
+          <span>&nbsp;</span>
+          <span>0</span><span>0</span><span>0</span><span>!!!</span>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
+    // ====== 1) "아니오" 버튼: 화면 밖으로 절대 안 나가게 + 근처 오면 순간이동 ======
     const yesBtn = document.getElementById("yesBtn");
-    const noBtn  = document.getElementById("noBtn");
-    const questionView = document.getElementById("questionView");
-    const resultView   = document.getElementById("resultView");
+    const noBtn = document.getElementById("noBtn");
+    const btnArea = document.getElementById("btnArea");
 
-    // "아니오" 버튼이 움직일 범위(화면 안에서 튀지 않게)
-    function clamp(v, min, max){ return Math.min(Math.max(v, min), max); }
+    function rand(min, max){ return Math.random() * (max - min) + min; }
 
-    function moveNoButtonAwayFrom(mouseX, mouseY){
-      const rect = noBtn.getBoundingClientRect();
-      const btnCenterX = rect.left + rect.width / 2;
-      const btnCenterY = rect.top  + rect.height / 2;
+    function placeNoButtonWithinArea(preferAwayFrom){
+      const areaRect = btnArea.getBoundingClientRect();
+      const btnRect  = noBtn.getBoundingClientRect();
 
-      const dx = btnCenterX - mouseX;
-      const dy = btnCenterY - mouseY;
+      // btnArea 안에서 버튼이 완전히 들어갈 수 있는 범위
+      const pad = 8;
+      const minX = pad;
+      const minY = pad;
+      const maxX = Math.max(pad, areaRect.width  - btnRect.width  - pad);
+      const maxY = Math.max(pad, areaRect.height - btnRect.height - pad);
 
-      // 마우스가 버튼에 가까워질 때만 이동
-      const dist = Math.hypot(dx, dy);
-      const trigger = 140; // 가까움 기준(px)
-      if (dist > trigger) return;
+      // 기본 랜덤 위치
+      let x = rand(minX, maxX);
+      let y = rand(minY, maxY);
 
-      // 방향 벡터 정규화 (마우스 반대 방향으로 밀어냄)
-      const nx = dx / (dist || 1);
-      const ny = dy / (dist || 1);
+      // 마우스 좌표가 있으면 "멀리" 가도록 몇 번 시도
+      if (preferAwayFrom) {
+        const tries = 8;
+        let best = {x, y, score: -1};
 
-      const step = 55; // 한번에 도망가는 정도(px)
+        for (let i=0; i<tries; i++){
+          const tx = rand(minX, maxX);
+          const ty = rand(minY, maxY);
 
-      // 현재 transform을 읽어서 누적 이동
-      const cur = noBtn.dataset.t ? JSON.parse(noBtn.dataset.t) : {x:0, y:0};
-      let nextX = cur.x + nx * step;
-      let nextY = cur.y + ny * step;
+          const btnCenterX = areaRect.left + tx + btnRect.width/2;
+          const btnCenterY = areaRect.top  + ty + btnRect.height/2;
 
-      // 화면 밖으로 너무 나가지 않도록 제한
-      // (버튼의 기준 위치 + transform이 화면에 남도록 clamp)
-      const margin = 10;
-      const maxLeft   = (window.innerWidth  - rect.width  - margin) - rect.left + cur.x;
-      const maxTop    = (window.innerHeight - rect.height - margin) - rect.top  + cur.y;
-      const maxRight  = (margin) - rect.left + cur.x;
-      const maxBottom = (margin) - rect.top  + cur.y;
+          const dx = btnCenterX - preferAwayFrom.x;
+          const dy = btnCenterY - preferAwayFrom.y;
+          const score = Math.hypot(dx, dy); // 멀수록 점수 높음
 
-      nextX = clamp(nextX, maxRight, maxLeft);
-      nextY = clamp(nextY, maxBottom, maxTop);
+          if (score > best.score) best = {x: tx, y: ty, score};
+        }
+        x = best.x; y = best.y;
+      }
 
-      noBtn.style.transform = `translate(${nextX}px, ${nextY}px)`;
-      noBtn.dataset.t = JSON.stringify({x: nextX, y: nextY});
+      // absolute 위치 적용 (btnArea 기준)
+      noBtn.style.left = `${x}px`;
+      noBtn.style.top  = `${y}px`;
+      noBtn.style.transform = `translate(0, 0)`;
     }
 
-    // 마우스가 버튼 근처로 오면 도망가게 만들기
-    document.addEventListener("mousemove", (e) => {
-      moveNoButtonAwayFrom(e.clientX, e.clientY);
-    }, { passive: true });
+    // 초기 위치 세팅: 로드 후 레이아웃 잡히면 배치
+    window.addEventListener("load", () => placeNoButtonWithinArea(null));
+    window.addEventListener("resize", () => placeNoButtonWithinArea(null));
 
-    // 혹시 모바일 터치에서도 도망가게
+    function handlePointerMove(clientX, clientY){
+      const btnRect = noBtn.getBoundingClientRect();
+      const cx = btnRect.left + btnRect.width/2;
+      const cy = btnRect.top  + btnRect.height/2;
+      const dist = Math.hypot(cx - clientX, cy - clientY);
+
+      const trigger = 120; // 가까우면 도망
+      if (dist < trigger){
+        placeNoButtonWithinArea({x: clientX, y: clientY});
+      }
+    }
+
+    document.addEventListener("mousemove", (e) => {
+      handlePointerMove(e.clientX, e.clientY);
+    }, {passive:true});
+
     document.addEventListener("touchmove", (e) => {
       const t = e.touches[0];
       if (!t) return;
-      moveNoButtonAwayFrom(t.clientX, t.clientY);
-    }, { passive: true });
+      handlePointerMove(t.clientX, t.clientY);
+    }, {passive:true});
 
-    // 예 클릭 시 결과 화면
-    yesBtn.addEventListener("click", () => {
+    // ====== 2) 예 클릭: 케이크 쌓기 -> 폭죽 -> 텍스트 ======
+    const questionView = document.getElementById("questionView");
+    const resultView   = document.getElementById("resultView");
+
+    const tiers = Array.from(document.querySelectorAll(".tier"));
+    const candle = document.getElementById("candle");
+    const happyText = document.getElementById("happyText");
+
+    // 폭죽 캔버스
+    const canvas = document.getElementById("fx");
+    const ctx = canvas.getContext("2d", { alpha: true });
+
+    function resizeCanvas(){
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener("resize", resizeCanvas);
+
+    // 간단 폭죽 파티클
+    let particles = [];
+    function spawnFirework(){
+      const rect = canvas.getBoundingClientRect();
+      const x = rand(rect.width * 0.2, rect.width * 0.8);
+      const y = rand(rect.height * 0.12, rect.height * 0.45);
+
+      const count = Math.floor(rand(36, 64));
+      for (let i=0; i<count; i++){
+        const a = rand(0, Math.PI * 2);
+        const sp = rand(2.0, 5.0);
+        particles.push({
+          x, y,
+          vx: Math.cos(a) * sp,
+          vy: Math.sin(a) * sp,
+          life: rand(38, 65),
+          size: rand(1.5, 2.8),
+          alpha: 1
+        });
+      }
+    }
+
+    function stepFireworks(){
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+
+      // 살짝 잔상 느낌
+      ctx.fillStyle = "rgba(0,0,0,0.10)";
+      ctx.fillRect(0, 0, rect.width, rect.height);
+
+      const gravity = 0.06;
+      particles = particles.filter(p => p.life > 0);
+
+      for (const p of particles){
+        p.vy += gravity;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 1;
+        p.alpha = Math.max(0, p.life / 65);
+
+        // 색은 지정하지 말랬던 규칙이 “차트/플롯”에 대한 거라서 여기선 자유지만,
+        // 그래도 심플하게 흰빛 파티클로 처리.
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(255,255,255,${0.75 * p.alpha})`;
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      requestAnimationFrame(stepFireworks);
+    }
+
+    function delay(ms){ return new Promise(res => setTimeout(res, ms)); }
+
+    async function playShow(){
+      // 화면 전환
       questionView.classList.add("hidden");
       resultView.classList.remove("hidden");
-    });
+
+      // 캔버스 리사이즈 + 루프 시작
+      resizeCanvas();
+      particles = [];
+      requestAnimationFrame(stepFireworks);
+
+      // 케이크 쌓기: 1층부터 순서대로
+      for (let i=0; i<tiers.length; i++){
+        tiers[i].classList.add("on");
+        await delay(420);
+      }
+
+      // 촛불
+      candle.classList.add("on");
+      await delay(350);
+
+      // 폭죽: 여러 번 터뜨리기
+      for (let i=0; i<8; i++){
+        spawnFirework();
+        await delay(220);
+      }
+
+      // 텍스트 등장
+      happyText.classList.add("on");
+    }
+
+    yesBtn.addEventListener("click", playShow);
   </script>
 </body>
 </html>
