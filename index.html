@@ -46,6 +46,10 @@
       backdrop-filter: blur(10px);
       position: relative;
       overflow:hidden;
+
+      /* 기존 그대로 두고 아래만 추가 */
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
     }
 
     h1{
@@ -127,13 +131,16 @@
     .stage{
       position: relative;
       width: 100%;
-      height: 460px;
+      min-height: 460px;  /* 최소만 유지 */
+      height: auto;       /* 내용에 따라 늘어남 */
+      padding-bottom: 18px;
       display:flex;
       align-items:center;
       justify-content:flex-start;
       flex-direction: column;
       gap: 10px;
     }
+
 
     /* 폭죽 캔버스 */
     #fx{
@@ -316,20 +323,20 @@
       z-index: 3;
       display:flex;
       flex-direction: column;
-      gap: 8px;
-      margin-top: 10px;
+      gap: 7px;
+      margin-top: 8px;
       align-items: center;
     }
     .msg{
       width: 100%;
       max-width: 520px;
-      padding: 10px 12px;
+      padding: 8px 10px;
       border-radius: 14px;
       border: 1px solid rgba(255,255,255,0.14);
       background: rgba(255,255,255,0.06);
       backdrop-filter: blur(6px);
       color: rgba(255,255,255,0.92);
-      font-size: 15px;
+      font-size: 14px;
       letter-spacing: -0.2px;
 
       opacity: 0;
@@ -423,22 +430,22 @@
 
         <!-- 케이크 층마다 차곡차곡 쌓일 문구들 -->
         <div class="messages" id="messages">
-          <div class="msg">1. 안뇽안뇽 나는 경서야</div>
-          <div class="msg">2. 해피 발렌타인 🎉🎊🎂</div>
-          <div class="msg">3. 해피 설날</div>
-          <div class="msg">4. 해피 졸업식</div>
-          <div class="msg">5. 해피 800일</div>
+          <div class="msg">안뇽안뇽 나는 경서야</div>
+          <div class="msg">해피 발렌타인 🎉🎊🎂</div>
+          <div class="msg">해피 설날</div>
+          <div class="msg">해피 졸업식</div>
+          <div class="msg">해피 800일</div>
         </div>
 
         <!-- 기존 happy 텍스트(요청대로 유지) -->
         <div class="happy" id="happyText">
-          <span>H</span><span>a</span><span>p</span><span>p</span><span>y</span>
+          <span>축</span><span>하</span><span>해</span><span>에</span><span>ㅠ</span>
           <span>&nbsp;</span>
-          <span>0</span><span>0</span><span>0</span><span>!!!</span>
+          <span>🥳</span><span>🎂</span><span>🎂</span><span></span>
         </div>
 
         <!-- 마지막 큰 축하 문구 -->
-        <div class="final" id="finalText">🥳축하해에ㅎㅎㅎ🎂</div>
+        <!-- <div class="final" id="finalText">🥳축하해에ㅎㅎㅎ🎂</div> -->
       </div>
     </div>
   </div>
