@@ -52,12 +52,12 @@
     }
 
     h1{
-      margin:0 0 10px;
+      margin:0 0 14px;
       font-size: 30px;
       letter-spacing: -0.6px;
     }
     p{
-      margin:0 0 26px;
+      margin:0 0 18px;
       color: var(--muted);
       font-size: 14px;
     }
@@ -130,8 +130,8 @@
     .stage{
       position: relative;
       width: 100%;
-      min-height: 460px; /* 최소만 유지 */
-      height: auto;      /* 내용에 따라 늘어남 */
+      min-height: 520px; /* ✅ 공간 넉넉하게 */
+      height: auto;
       padding-bottom: 18px;
       display:flex;
       align-items:center;
@@ -154,13 +154,13 @@
     .cake-wrap{
       position: relative;
       width: 340px;
-      height: 260px;
+      height: 300px;      /* ✅ 케이크 위 공간 확보 */
       display:flex;
       align-items:flex-end;
       justify-content:center;
       z-index: 2;
       filter: drop-shadow(0 10px 18px rgba(0,0,0,0.35));
-      margin-top: 10px;
+      margin-top: 16px;   /* ✅ 위쪽 여백 */
     }
 
     .plate{
@@ -259,7 +259,7 @@
     .candle{
       position:absolute;
       left: 50%;
-      bottom: 260px;
+      bottom: 292px; /* ✅ 위로 올려 겹침 방지 */
       transform: translateX(-50%) translateY(40px);
       width: 16px;
       height: 40px;
@@ -291,7 +291,7 @@
     .topping{
       position:absolute;
       left: 50%;
-      bottom: 248px;
+      bottom: 280px; /* ✅ 촛불 아래로 */
       transform: translateX(-50%) translateY(18px);
       width: 26px;
       height: 22px;
@@ -316,7 +316,7 @@
     }
     .topping.on{ opacity:1; transform: translateX(-50%) translateY(0); }
 
-    /* 문구가 케이크 쌓임과 함께 차곡차곡 */
+    /* 문구(번호 제거) */
     .messages{
       width: min(520px, 92%);
       z-index: 3;
@@ -347,7 +347,7 @@
       transform: translateY(0) scale(1);
     }
 
-    /* ✅ Happy000은 제거, 대신 축하해에ㅎㅎㅎ를 메인으로 */
+    /* 최종 축하 문구 */
     .final{
       z-index: 3;
       margin-top: 12px;
@@ -372,8 +372,7 @@
 
     <!-- 질문 화면 -->
     <div id="questionView">
-      <h1>경서랑 요거트 먹어줄 건가요?</h1>
-      <p>아니오를 누르려고 하면… 화면 안에서만 도망갑니다 😈</p>
+      <h1>경서랑 요거트 먹어줄 건가요? 🥣</h1>
 
       <div class="btn-area" id="btnArea">
         <button id="yesBtn" type="button">예</button>
@@ -402,16 +401,15 @@
           <div class="topping" id="topping" aria-hidden="true"></div>
         </div>
 
-        <!-- 케이크 층마다 차곡차곡 쌓일 문구들 -->
+        <!-- 문구들(번호 제거) -->
         <div class="messages" id="messages">
-          <div class="msg">1. 안뇽안뇽 나는 경서야</div>
-          <div class="msg">2. 해피 발렌타인 🎉🎊🎂</div>
-          <div class="msg">3. 해피 설날</div>
-          <div class="msg">4. 해피 졸업식</div>
-          <div class="msg">5. 해피 800일</div>
+          <div class="msg">안뇽안뇽 나는 경서야</div>
+          <div class="msg">해피 발렌타인 🎉🎊🎂</div>
+          <div class="msg">해피 설날</div>
+          <div class="msg">해피 졸업식</div>
+          <div class="msg">해피 800일</div>
         </div>
 
-        <!-- ✅ Happy000 삭제, 최종 축하 문구만 -->
         <div class="final" id="finalText">🥳축하해에ㅎㅎㅎ🎂</div>
       </div>
     </div>
@@ -511,7 +509,7 @@
     function spawnFirework(){
       const rect = canvas.getBoundingClientRect();
       const x = rand(rect.width * 0.2, rect.width * 0.8);
-      const y = rand(rect.height * 0.10, rect.height * 0.45);
+      const y = rand(rect.height * 0.08, rect.height * 0.40);
 
       const count = Math.floor(rand(38, 68));
       for (let i=0; i<count; i++){
