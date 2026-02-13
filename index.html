@@ -7,9 +7,9 @@
 
   <style>
     :root{
-      --bg1:#0a2a1a;   /* deep green */
-      --bg2:#4b2a1b;   /* cocoa brown */
-      --bg3:#ff6fb3;   /* pink */
+      --bg1:#0a2a1a;
+      --bg2:#4b2a1b;
+      --bg3:#ff6fb3;
       --card: rgba(18,26,43,0.55);
       --stroke: rgba(255,255,255,0.12);
       --text:#eef3ff;
@@ -96,7 +96,6 @@
       50%{ transform: translateY(-10px) rotate(1deg) scale(1.02); }
     }
 
-    /* 반짝이 */
     .sparkles{
       position:absolute;
       inset:0;
@@ -111,25 +110,24 @@
         radial-gradient(2px 2px at 85% 78%, rgba(255,255,255,0.26), transparent 60%);
     }
 
-    /* 내용 레이어는 장식 위 */
     .content{ position: relative; z-index: 2; }
 
     h1{
-      margin:0 0 14px;
+      margin:0 0 16px;
       font-size: 30px;
       letter-spacing: -0.6px;
     }
 
-    /* 질문 화면 버튼 영역 */
+    /* ✅ 질문 화면 버튼 영역: flex로 "진짜" 나란히, 겹침 없음 */
     .btn-area{
       position: relative;
       width: 100%;
-      height: 92px;
+      height: auto;
       display:flex;
       align-items:center;
       justify-content:center;
-      gap: 14px;
-      margin-top: 6px;
+      gap: 12px;
+      margin-top: 10px;
     }
 
     button{
@@ -153,18 +151,11 @@
     }
     #yesBtn:hover{ filter: brightness(1.06); transform: translateY(-1px); }
 
-    /* 아니오는 btn-area 내부 absolute로만 이동 */
+    /* ✅ 처음엔 flex item(겹침X), 도망 시작하면 absolute로 변경 */
     #noBtn{
       background: rgba(200,255,212,0.18);
       color: var(--text);
       border: 1px solid rgba(255,255,255,0.16);
-      position: absolute;
-      /* ✅ 처음엔 옆에 나란히 보이게: 가운데 기준 오른쪽 */
-      left: calc(50% + 95px);
-      top: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 4;
-      will-change: left, top, transform;
     }
     #noBtn:hover{ filter: brightness(1.08); }
 
@@ -184,7 +175,6 @@
       gap: 10px;
     }
 
-    /* 폭죽 캔버스 */
     #fx{
       position:absolute;
       inset:0;
@@ -198,7 +188,7 @@
     .cake-wrap{
       position: relative;
       width: 340px;
-      height: 320px;      /* ✅ 촛불 겹침 방지: 더 넉넉 */
+      height: 320px;
       display:flex;
       align-items:flex-end;
       justify-content:center;
@@ -296,11 +286,11 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* 촛불 (더 위로 + 공간 넉넉) */
+    /* ✅ 촛불이 너무 떨어져 보였던 문제: bottom 값을 낮춰 케이크에 더 붙임 */
     .candle{
       position:absolute;
       left: 50%;
-      bottom: 308px;
+      bottom: 274px; /* (이전 308px → 274px) */
       transform: translateX(-50%) translateY(40px);
       width: 16px;
       height: 40px;
@@ -331,7 +321,7 @@
     .topping{
       position:absolute;
       left: 50%;
-      bottom: 296px;
+      bottom: 262px; /* 촛불 바로 아래 */
       transform: translateX(-50%) translateY(18px);
       width: 26px;
       height: 22px;
@@ -406,37 +396,30 @@
 
 <body>
   <div class="card">
-    <!-- 장식 레이어 -->
     <div class="decor" aria-hidden="true">
       <div class="green-dot dot1"></div>
       <div class="green-dot dot2"></div>
       <div class="green-dot dot3"></div>
       <div class="green-dot dot4"></div>
 
-      <!-- 말티즈 느낌: 🐶 2마리 -->
       <div class="floaty dog1 big">🐶</div>
       <div class="floaty dog2 big">🐶</div>
 
-      <!-- 고기/치킨 -->
       <div class="floaty meat mid">🍖</div>
       <div class="floaty chicken mid">🍗</div>
     </div>
     <div class="sparkles"></div>
 
-    <!-- 내용 레이어 -->
     <div class="content">
-      <!-- 질문 화면 -->
       <div id="questionView">
         <h1>경서랑 요거트 먹어줄 건가요? 🥣</h1>
 
-        <!-- ✅ 처음엔 예/아니오 나란히 -->
         <div class="btn-area" id="btnArea">
           <button id="yesBtn" type="button">예</button>
           <button id="noBtn" type="button">아니오</button>
         </div>
       </div>
 
-      <!-- 결과 화면 -->
       <div id="resultView" class="hidden">
         <div class="stage">
           <canvas id="fx"></canvas>
@@ -472,15 +455,33 @@
   </div>
 
   <script>
-    // ====== 1) "아니오" 버튼: 가까이 오면 btn-area 내부에서만 도망 ======
+    // ====== 1) "아니오" 버튼: 처음엔 flex로 나란히, 가까이 오면 absolute로 도망 ======
     const yesBtn = document.getElementById("yesBtn");
     const noBtn  = document.getElementById("noBtn");
     const btnArea = document.getElementById("btnArea");
 
     function rand(min, max){ return Math.random() * (max - min) + min; }
-    let didFirstLayout = false;
+
+    let noIsFloating = false;
+
+    function enableNoFloating(){
+      if (noIsFloating) return;
+      // 현재 화면 위치를 btn-area 기준 좌표로 변환해서 absolute로 전환
+      const areaRect = btnArea.getBoundingClientRect();
+      const btnRect  = noBtn.getBoundingClientRect();
+      const left = btnRect.left - areaRect.left;
+      const top  = btnRect.top  - areaRect.top;
+
+      noBtn.style.position = "absolute";
+      noBtn.style.left = `${left}px`;
+      noBtn.style.top  = `${top}px`;
+      noBtn.style.transform = "translate(0,0)";
+      noIsFloating = true;
+    }
 
     function placeNoButtonWithinArea(preferAwayFrom){
+      enableNoFloating();
+
       const areaRect = btnArea.getBoundingClientRect();
       const btnRect  = noBtn.getBoundingClientRect();
 
@@ -490,21 +491,9 @@
       const maxX = Math.max(pad, areaRect.width  - btnRect.width  - pad);
       const maxY = Math.max(pad, areaRect.height - btnRect.height - pad);
 
-      // ✅ 첫 배치: "예" 오른쪽에 나란히 (center y)
-      if (!preferAwayFrom && !didFirstLayout){
-        const x = Math.min(maxX, Math.max(minX, (areaRect.width/2) + 14));
-        const y = (areaRect.height - btnRect.height) / 2;
-        noBtn.style.left = `${x}px`;
-        noBtn.style.top  = `${y}px`;
-        noBtn.style.transform = `translate(0, 0)`;
-        didFirstLayout = true;
-        return;
-      }
-
       let x = rand(minX, maxX);
       let y = rand(minY, maxY);
 
-      // 마우스/터치 위치에서 최대한 멀리 보내기
       if (preferAwayFrom) {
         const tries = 10;
         let best = {x, y, score: -1};
@@ -526,8 +515,16 @@
       noBtn.style.transform = `translate(0, 0)`;
     }
 
-    window.addEventListener("load", () => placeNoButtonWithinArea(null));
-    window.addEventListener("resize", () => { didFirstLayout = false; placeNoButtonWithinArea(null); });
+    // 리사이즈 시: 질문 화면에서만 초기화
+    window.addEventListener("resize", () => {
+      if (!document.getElementById("questionView").classList.contains("hidden")) {
+        noIsFloating = false;
+        noBtn.style.position = "";
+        noBtn.style.left = "";
+        noBtn.style.top = "";
+        noBtn.style.transform = "";
+      }
+    });
 
     function handlePointerMove(clientX, clientY){
       const btnRect = noBtn.getBoundingClientRect();
@@ -542,16 +539,18 @@
     }
 
     document.addEventListener("mousemove", (e) => {
+      if (document.getElementById("questionView").classList.contains("hidden")) return;
       handlePointerMove(e.clientX, e.clientY);
     }, {passive:true});
 
     document.addEventListener("touchmove", (e) => {
+      if (document.getElementById("questionView").classList.contains("hidden")) return;
       const t = e.touches[0];
       if (!t) return;
       handlePointerMove(t.clientX, t.clientY);
     }, {passive:true});
 
-    // ====== 2) 예 클릭: 케이크 쌓기 + 문구 쌓기 -> 촛불/토핑 -> 폭죽 -> 축하 문구 ======
+    // ====== 2) 예 클릭: 케이크 쌓기 + 문구 -> 촛불/토핑 -> 폭죽 -> 축하 ======
     const questionView = document.getElementById("questionView");
     const resultView   = document.getElementById("resultView");
 
@@ -575,6 +574,8 @@
     window.addEventListener("resize", resizeCanvas);
 
     let particles = [];
+    function rand(min, max){ return Math.random() * (max - min) + min; }
+
     function spawnFirework(){
       const rect = canvas.getBoundingClientRect();
       const x = rand(rect.width * 0.2, rect.width * 0.8);
@@ -638,25 +639,21 @@
       particles = [];
       requestAnimationFrame(stepFireworks);
 
-      // stack tiers + messages
       for (let i=0; i<tiers.length; i++){
         tiers[i].classList.add("on");
         if (msgs[i]) msgs[i].classList.add("show");
         await delay(650);
       }
 
-      // candle + topping
       candle.classList.add("on");
       topping.classList.add("on");
       await delay(380);
 
-      // fireworks
       for (let i=0; i<9; i++){
         spawnFirework();
         await delay(220);
       }
 
-      // final text
       finalText.classList.add("on");
     }
 
